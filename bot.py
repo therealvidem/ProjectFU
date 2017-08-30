@@ -7,6 +7,8 @@ from discord.ext.commands.bot import Bot
 from discord.ext import commands
 from discord.utils import get
 
+global_prefix = 's-'
+
 class FUBot(Bot):
     '''
     A class that extends Bot for the sole
@@ -28,8 +30,11 @@ bot would look something like this:
 python bot.py [token]
 '''
 
+# Making sure we're in the file's relative directory.
+os.chdir(sys.path[0])
+
 try:
-    bot = FUBot('s-', checks.owner_id, pm_help=True)
+    bot = FUBot(global_prefix, checks.owner_id, pm_help=True)
     # Hacky way of dynamically loading extensions (?)
     for ext in os.listdir('commands'):
         if ext != 'basecog.py' and ext.endswith('.py'):
