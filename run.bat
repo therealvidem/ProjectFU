@@ -1,3 +1,0 @@
-python bot.py MzUxNTg0NDg0NDU1NjEyNDE2.DIUuFA.YOvI3aaZr_XlX786tWWjVk140AE
-
-pause
