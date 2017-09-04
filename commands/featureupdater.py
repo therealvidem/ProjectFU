@@ -89,7 +89,7 @@ class FeatureUpdater(basecog.BaseCog):
             await self.bot.say('You have to set the channel using "{}fu setchannel <id>"'.format(self.prefix))
             return
         for i in range(len(self.features), 0):
-            await self.bot.send_message(self.channel, json.dumps(self.features[i ], separators=(',', ':')))
+            await self.bot.send_message(self.channel, json.dumps(self.features[i], separators=(',', ':')))
             await asyncio.sleep(1)
 
 def setup(bot):
