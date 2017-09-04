@@ -5,7 +5,6 @@ import discord
 import checks
 from discord.ext.commands.bot import Bot
 from discord.ext import commands
-from discord.utils import get
 
 global_prefix = 's-'
 

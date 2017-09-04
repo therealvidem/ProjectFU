@@ -21,14 +21,14 @@ class Common(basecog.BaseCog):
         print('Logging in to {} guild(s)...'.format(len(self.bot.servers)))
 
     async def on_command_error(self, error, ctx):
-        if isinstance(error, commands.MissingRequiredArgument):
+        if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.BadArgument):
             await self.send_help(ctx)
         else:
             if hasattr(ctx.command, "on_error"):
                 return
             print('Ignoring exception in command {}'.format(ctx.command), file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-            await self.bot.say('An error occured while trying to do that command.')
+            await self.bot.send_message(ctx.message.channel, 'An error occured while trying to do that command.')
 
 def setup(bot):
     bot.add_cog(Common(bot))
