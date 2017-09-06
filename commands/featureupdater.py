@@ -1,19 +1,22 @@
 import discord
 import checks
 import json
+import data
 import asyncio
 import discord.embeds as embeds
-from . import basecog
+from .bases import DataCog
 from discord.ext import commands
 
-class FeatureUpdater(basecog.BaseCog):
+class FeatureUpdater(DataCog):
     '''
     Updates the featured builders for Sandbox.
     '''
 
-    def __init__(self, bot):
-        super().__init__(bot)
-        self.features = {}
+    def __init__(self, bot, cogname):
+        super().__init__(bot, cogname)
+        if 'features' not in self.settings:
+            self.settings['features'] = {}
+        self.features = self.settings['features']
         self.channel = None
         self.num_text = {
             1: '1st',
@@ -32,6 +35,7 @@ class FeatureUpdater(basecog.BaseCog):
                 'blurb': ''
             }
         self.features[num][prop] = content
+        await self.save_settings()
         await self.bot.say('Successfully set the {} of the {} featured builder.'.format(prop, self.num_text[num]))
 
     @commands.group(pass_context=True, invoke_without_command=True)
@@ -51,6 +55,7 @@ class FeatureUpdater(basecog.BaseCog):
     @checks.is_admin()
     async def fu_new(self, ctx):
         self.features = {}
+        await self.save_settings()
         await self.bot.say('Successfully reset the featured list.')
 
     @fu.command(pass_context=True, name='display')
@@ -90,8 +95,8 @@ class FeatureUpdater(basecog.BaseCog):
             return
         for i in range(len(self.features), 0):
             await self.bot.send_message(self.channel, json.dumps(self.features[i], separators=(',', ':')))
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.2)
 
 def setup(bot):
-    bot.add_cog(FeatureUpdater(bot))
+    bot.add_cog(FeatureUpdater(bot, 'featureupdater'))
 

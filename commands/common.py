@@ -1,21 +1,17 @@
 import asyncio
+import aioconsole
 import checks
 import discord
 import sys
 import traceback
-from . import basecog
+import math
+from .bases import BaseCog
 from discord.ext import commands
 
-class Common(basecog.BaseCog):
+class Common(BaseCog):
     '''
     Common events and commands.
     '''
-
-    @commands.command(pass_context=True)
-    @checks.is_admin()
-    async def shutdown(self, ctx):
-        await self.bot.say('Shutting down...')
-        await self.bot.logout()
 
     async def on_ready(self):
         print('Logging in to {} guild(s)...'.format(len(self.bot.servers)))
@@ -23,6 +19,14 @@ class Common(basecog.BaseCog):
     async def on_command_error(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.BadArgument):
             await self.send_help(ctx)
+        elif isinstance(error, commands.CheckFailure):
+            await self.bot.send_message(ctx.message.channel, 'You\'re not allowed to use that command.')
+        elif isinstance(error, commands.CommandOnCooldown):
+            seconds = math.floor(error.retry_after)
+            article = 'second' if seconds == 1 else 'seconds'
+            await self.bot.send_message(ctx.message.channel, 'You must wait {} {}.'.format(seconds, article))
+        elif isinstance(error, commands.CommandNotFound):
+            pass
         else:
             if hasattr(ctx.command, "on_error"):
                 return
@@ -30,5 +34,11 @@ class Common(basecog.BaseCog):
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
             await self.bot.send_message(ctx.message.channel, 'An error occured while trying to do that command.')
 
+    @commands.command(pass_context=True)
+    @checks.is_admin()
+    async def shutdown(self, ctx):
+        await self.bot.say('Shutting down...')
+        await self.bot.logout
+
 def setup(bot):
-    bot.add_cog(Common(bot))
+    bot.add_cog(Common(bot, 'common'))

@@ -1,19 +1,21 @@
-from datetime import datetime
-from discord.errors import HTTPException
 import discord
 import checks
 import discord.embeds as embeds
-from . import basecog
+from .bases import DataCog
 from discord.ext import commands
+from discord.errors import HTTPException
+from datetime import datetime
 
-class Embed(basecog.BaseCog):
+class Embed(DataCog):
     '''
     Emote builder.
     '''
 
-    def __init__(self, bot):
-        super().__init__(bot)
-        self.user_embeds = {}
+    def __init__(self, bot, cogname):
+        super().__init__(bot, cogname)
+        if 'user_embeds' not in self.settings:
+            self.settings['user_embeds'] = {}
+        self.user_embeds = self.settings['user_embeds']
         self.success_message = 'Successfully set the {} to {}'
     
     async def check_embed(self, ctx):
@@ -63,6 +65,7 @@ class Embed(basecog.BaseCog):
         self.user_embeds[member.id] = {
             'title': 'New Embed'
         }
+        await self.save_settings()
         await self.bot.say('Initialized a new embed. You may start configuring its properties using "{}buildembed modify"'.format(self.prefix))
 
     @buildembed.group(pass_context=True, name='modify', invoke_without_command=True)
@@ -75,6 +78,7 @@ class Embed(basecog.BaseCog):
             return
         embed = self.user_embeds[ctx.message.author.id]
         embed['title'] = value
+        await self.save_settings()
         await self.bot.say(self.success_message.format('title', value))
 
     @buildembed_modify.command(pass_context=True, name='author')
@@ -89,6 +93,7 @@ class Embed(basecog.BaseCog):
             embed['author']['url'] = url
         if icon_url:
             embed['author']['icon_url'] = icon_url
+        await self.save_settings()
         await self.bot.say(self.success_message.format('author', name))
 
     @buildembed_modify.command(pass_context=True, name='description')
@@ -97,6 +102,7 @@ class Embed(basecog.BaseCog):
             return
         embed = self.user_embeds[ctx.message.author.id]
         embed['description'] = value
+        await self.save_settings()
         await self.bot.say(self.success_message.format('description', value))
 
     @buildembed_modify.command(pass_context=True, name='url')
@@ -105,6 +111,7 @@ class Embed(basecog.BaseCog):
             return
         embed = self.user_embeds[ctx.message.author.id]
         embed['url'] = value
+        await self.save_settings()
         await self.bot.say(self.success_message.format('url', value))
 
     @buildembed_modify.command(pass_context=True, name='colour')
@@ -119,6 +126,7 @@ class Embed(basecog.BaseCog):
                 await self.bot.say('Value must be a hexadecimal colour.')
                 return
         embed['colour'] = value
+        await self.save_settings()
         await self.bot.say(self.success_message.format('colour', value))
 
     @buildembed_modify.command(pass_context=True, name='timestamp')
@@ -139,6 +147,7 @@ class Embed(basecog.BaseCog):
             await self.bot.say('That date is not valid.')
             return
         embed['timestamp'] = dt.isoformat()
+        await self.save_settings()
         await self.bot.say(self.success_message.format('timestamp', dt))
 
     @buildembed_modify.command(pass_context=True, name='footer')
@@ -151,6 +160,7 @@ class Embed(basecog.BaseCog):
         }
         if icon_url:
             embed['footer']['icon_url'] = icon_url
+        await self.save_settings()
         await self.bot.say('Successfully set the footer')
 
     @buildembed_modify.command(pass_context=True, name='thumbnail')
@@ -161,6 +171,7 @@ class Embed(basecog.BaseCog):
         embed['thumbnail'] = {
             'url': url    
         }
+        await self.save_settings()
         await self.bot.say(self.success_message.format('thumbnail', url))
 
     @buildembed.command(pass_context=True, name='addfield')
@@ -174,6 +185,7 @@ class Embed(basecog.BaseCog):
             'value': value,
             'inline': True
         })
+        await self.save_settings()
         await self.bot.say('Successfully added field')
 
     @buildembed.command(pass_context=True, name='addfieldnotinline')
@@ -187,6 +199,7 @@ class Embed(basecog.BaseCog):
             'value': value,
             'inline': False
         })
+        await self.save_settings()
         await self.bot.say('Successfully added non-inline field')
 
     @buildembed.command(pass_context=True, name='removefield')
@@ -200,6 +213,7 @@ class Embed(basecog.BaseCog):
         except IndexError:
             await self.bot.say('That index doesn\'t exist.')
             return
+        await self.save_settings()
         await self.bot.say('Successfully removed field')
 
     @buildembed.command(pass_context=True, name='setfield')
@@ -216,6 +230,7 @@ class Embed(basecog.BaseCog):
         field['name'] = name
         field['value'] = value
         field['inline'] = True
+        await self.save_settings()
         await self.bot.say('Successfully set field')
 
     @buildembed.command(pass_context=True, name='setfieldnotinline')
@@ -232,7 +247,8 @@ class Embed(basecog.BaseCog):
         field['name'] = name
         field['value'] = value
         field['inline'] = False
+        await self.save_settings()
         await self.bot.say('Successfully set non-inline field')
 
 def setup(bot):
-    bot.add_cog(Embed(bot))
+    bot.add_cog(Embed(bot, 'embed'))

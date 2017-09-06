@@ -1,9 +1,9 @@
 import checks
 import discord
-from . import basecog
+from .bases import BaseCog
 from discord.ext import commands
 
-class Mod(basecog.BaseCog):
+class Mod(BaseCog):
     '''
     Server moderation commands.
     '''
@@ -14,4 +14,4 @@ class Mod(basecog.BaseCog):
         await self.bot.kick(user)
 
 def setup(bot):
-    bot.add_cog(Mod(bot))
+    bot.add_cog(Mod(bot, 'mod'))
