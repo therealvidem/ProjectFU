@@ -38,7 +38,18 @@ class Common(BaseCog):
     @checks.is_admin()
     async def shutdown(self, ctx):
         await self.bot.say('Shutting down...')
-        await self.bot.logout
+        await self.bot.logout()
+
+    @commands.group(pass_context=True, invoke_without_command=True)
+    @checks.is_admin()
+    async def setbot(self, ctx):
+        await self.send_help(ctx)
+
+    @setbot.command(pass_context=True, name='name')
+    @checks.is_admin()
+    async def bot_name(self, ctx, *, name):
+        await self.bot.edit_profile(username=name)
+        await self.bot.say('Successfully set name.')
 
 def setup(bot):
     bot.add_cog(Common(bot, 'common'))

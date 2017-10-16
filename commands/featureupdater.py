@@ -16,8 +16,9 @@ class FeatureUpdater(DataCog):
         super().__init__(bot, cogname)
         if 'features' not in self.settings:
             self.settings['features'] = {}
-        self.features = self.settings['features']
-        self.channel = None
+        if 'channel' not in self.settings:
+            self.settings['channel'] = ''
+        self.channel = discord.utils.get(bot.get_all_channels(), id=self.settings['channel'])
         self.num_text = {
             1: '1st',
             2: '2nd',
@@ -25,16 +26,18 @@ class FeatureUpdater(DataCog):
         }
 
     async def set_prop(self, ctx, num: int, prop, content):
-        if num and num not in self.features:
+        if num and num not in self.settings['features']:
             if num not in range(1, 4):
                 await self.bot.say('The num of the feature must be 1, 2, or 3.')
                 return
-            self.features[num] = {
+            self.settings['features'][num] = {
                 'userId': 0,
-                'image': '',
+                'image1': '',
+                'image2': '',
+                'image3': '',
                 'blurb': ''
             }
-        self.features[num][prop] = content
+        self.settings['features'][num][prop] = content
         await self.save_settings()
         await self.bot.say('Successfully set the {} of the {} featured builder.'.format(prop, self.num_text[num]))
 
@@ -46,22 +49,24 @@ class FeatureUpdater(DataCog):
     @fu.command(pass_context=True, name='setchannel')
     @checks.is_admin()
     async def fu_setchannel(self, ctx, id: int):
-        if not self.bot.get_channel(str(id)):
-            await self.bot.say('That\'s not a valid channel id.')
-        self.channel = self.bot.get_channel(str(id))
-        await self.bot.say('Successfully set the channel id to {}.'.format(id))
+         if not self.bot.get_channel(str(id)):
+            await self.bot.say('{} is not a valid channel id.'.format(id))
+         self.channel = self.bot.get_channel(str(id))
+         self.settings['channel'] = str(id)
+         await self.save_settings()
+         await self.bot.say('Successfully set the channel id to {}.'.format(id))
 
     @fu.command(pass_context=True, name='new')
     @checks.is_admin()
     async def fu_new(self, ctx):
-        self.features = {}
+        self.settings['features'] = {}
         await self.save_settings()
         await self.bot.say('Successfully reset the featured list.')
 
     @fu.command(pass_context=True, name='display')
     @checks.is_admin()
     async def fu_display(self, ctx):
-        await self.bot.say(json.dumps(self.features, separators=(',', ':')))
+        await self.bot.say(json.dumps(self.settings['features'], separators=(', ', ': ')))
 
     '''
     I *could* remove the repetition for these three commands (i.e. compact it into one command that takes the property,)
@@ -74,27 +79,37 @@ class FeatureUpdater(DataCog):
         await self.set_prop(ctx, num, 'userId', userId)
 
     # Note: This must some form of a ROBLOX asset id.
-    @fu.command(pass_context=True, name='image')
+    @fu.command(pass_context=True, name='image1')
     @checks.is_admin()
-    async def fu_image(self, ctx, num: int, image):
-        await self.set_prop(ctx, num, 'image', image)
+    async def fu_image1(self, ctx, num: int, image):
+        await self.set_prop(ctx, num, 'image1', image)
+
+    @fu.command(pass_context=True, name='image2')
+    @checks.is_admin()
+    async def fu_image2(self, ctx, num: int, image):
+        await self.set_prop(ctx, num, 'image2', image)
+
+    @fu.command(pass_context=True, name='image3')
+    @checks.is_admin()
+    async def fu_image3(self, ctx, num: int, image):
+        await self.set_prop(ctx, num, 'image3', image)
 
     @fu.command(pass_context=True, name='blurb')
     @checks.is_admin()
-    async def fu_blurb(self, ctx, num: int, blurb):
+    async def fu_blurb(self, ctx, num: int, *, blurb):
         await self.set_prop(ctx, num, 'blurb', blurb)
         
     @fu.command(pass_context=True, name='confirm')
     @checks.is_admin()
     async def fu_confirm(self, ctx):
-        if len(self.features) < 3:
-            await self.bot.say('There aren\'t enough features (3 needed.)')
-            return
+        #if len(self.settings['features']) < 3:
+        #    await self.bot.say('There aren\'t enough features (3 needed.)')
+        #    return
         if not self.channel:
             await self.bot.say('You have to set the channel using "{}fu setchannel <id>"'.format(self.prefix))
             return
-        for i in range(len(self.features), 0):
-            await self.bot.send_message(self.channel, json.dumps(self.features[i], separators=(',', ':')))
+        for i in range(1, len(self.settings['features']) + 1):
+            await self.bot.send_message(self.channel, json.dumps(self.settings['features'][str(i)], separators=(', ', ': ')))
             await asyncio.sleep(0.2)
 
 def setup(bot):

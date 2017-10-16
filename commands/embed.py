@@ -46,6 +46,7 @@ class Embed(DataCog):
         await self.send_help(ctx)
 
     @buildembed.command(pass_context=True, name='display')
+    @checks.is_admin()
     async def buildembed_display(self, ctx):
         if not await self.check_embed(ctx):
             return
@@ -60,6 +61,7 @@ class Embed(DataCog):
             await self.bot.say('Something went wrong while trying to send the embed.')
 
     @buildembed.command(pass_context=True, name='new')
+    @checks.is_admin()
     async def buildembed_new(self, ctx):
         member = ctx.message.author
         self.user_embeds[member.id] = {
@@ -69,10 +71,12 @@ class Embed(DataCog):
         await self.bot.say('Initialized a new embed. You may start configuring its properties using "{}buildembed modify"'.format(self.prefix))
 
     @buildembed.group(pass_context=True, name='modify', invoke_without_command=True)
+    @checks.is_admin()
     async def buildembed_modify(self, ctx):
         await self.send_help(ctx)
 
     @buildembed_modify.command(pass_context=True, name='title')
+    @checks.is_admin()
     async def buildembed_modify_title(self, ctx, *, value=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'title', value):
             return
@@ -82,6 +86,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('title', value))
 
     @buildembed_modify.command(pass_context=True, name='author')
+    @checks.is_admin()
     async def buildembed_modify_author(self, ctx, name=None, url=None, icon_url=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'author', name):
             return
@@ -97,6 +102,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('author', name))
 
     @buildembed_modify.command(pass_context=True, name='description')
+    @checks.is_admin()
     async def buildembed_modify_description(self, ctx, *, value=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'description', value):
             return
@@ -106,6 +112,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('description', value))
 
     @buildembed_modify.command(pass_context=True, name='url')
+    @checks.is_admin()
     async def buildembed_modify_url(self, ctx, value=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'url', value):
             return
@@ -115,6 +122,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('url', value))
 
     @buildembed_modify.command(pass_context=True, name='colour')
+    @checks.is_admin()
     async def buildembed_modify_colour(self, ctx, value: int=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'colour', value):
             return
@@ -130,6 +138,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('colour', value))
 
     @buildembed_modify.command(pass_context=True, name='timestamp')
+    @checks.is_admin()
     async def buildembed_modify_timestamp(self, ctx, year: int=None, month: int=None, day: int=None, hour: int=None, minute: int=None, second: int=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'timestamp', day, 'Successfully set the {} to {}.\nNote: You have to pass in the year, month, and day at the very least.'):
             return
@@ -151,6 +160,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('timestamp', dt))
 
     @buildembed_modify.command(pass_context=True, name='footer')
+    @checks.is_admin()
     async def buildembed_modify_footer(self, ctx, text=None, icon_url=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'footer', text):
             return
@@ -164,6 +174,7 @@ class Embed(DataCog):
         await self.bot.say('Successfully set the footer')
 
     @buildembed_modify.command(pass_context=True, name='thumbnail')
+    @checks.is_admin()
     async def buildembed_modify_thumbnail(self, ctx, url=None):
         if not await self.check_embed(ctx) or not await self.check_value(ctx, 'thumbnail', url):
             return
@@ -175,6 +186,7 @@ class Embed(DataCog):
         await self.bot.say(self.success_message.format('thumbnail', url))
 
     @buildembed.command(pass_context=True, name='addfield')
+    @checks.is_admin()
     async def buildembed_addfield(self, ctx, name, *, value):
         if not await self.check_embed(ctx):
             return
@@ -189,6 +201,7 @@ class Embed(DataCog):
         await self.bot.say('Successfully added field')
 
     @buildembed.command(pass_context=True, name='addfieldnotinline')
+    @checks.is_admin()
     async def buildembed_addfieldnotinline(self, ctx, name, *, value):
         if not await self.check_embed(ctx):
             return
@@ -203,6 +216,7 @@ class Embed(DataCog):
         await self.bot.say('Successfully added non-inline field')
 
     @buildembed.command(pass_context=True, name='removefield')
+    @checks.is_admin()
     async def buildembed_removefield(self, ctx, index: int):
         if not await self.check_embed(ctx):
             return
@@ -217,6 +231,7 @@ class Embed(DataCog):
         await self.bot.say('Successfully removed field')
 
     @buildembed.command(pass_context=True, name='setfield')
+    @checks.is_admin()
     async def buildembed_setfield(self, ctx, index: int, name, value):
         if not await self.check_embed(ctx):
             return
@@ -234,6 +249,7 @@ class Embed(DataCog):
         await self.bot.say('Successfully set field')
 
     @buildembed.command(pass_context=True, name='setfieldnotinline')
+    @checks.is_admin()
     async def buildembed_setfieldnotinline(self, ctx, index: int, name, value):
         if not await self.check_embed(ctx):
             return
