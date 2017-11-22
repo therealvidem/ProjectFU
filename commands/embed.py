@@ -190,7 +190,7 @@ class Embed(DataCog):
     async def buildembed_addfield(self, ctx, name, *, value):
         if not await self.check_embed(ctx):
             return
-        await self.check_field(ctx)
+        await self.check_fields(ctx)
         embed = self.user_embeds[ctx.message.author.id]
         embed['fields'].insert(0, {
             'name': name,
@@ -205,7 +205,7 @@ class Embed(DataCog):
     async def buildembed_addfieldnotinline(self, ctx, name, *, value):
         if not await self.check_embed(ctx):
             return
-        await self.check_field(ctx)
+        await self.check_fields(ctx)
         embed = self.user_embeds[ctx.message.author.id]
         embed['fields'].insert(0, {
             'name': name,
@@ -220,7 +220,7 @@ class Embed(DataCog):
     async def buildembed_removefield(self, ctx, index: int):
         if not await self.check_embed(ctx):
             return
-        await self.check_field(ctx)
+        await self.check_fields(ctx)
         embed = self.user_embeds[ctx.message.author.id]
         try:
             del embed['fields'][index]
@@ -235,7 +235,7 @@ class Embed(DataCog):
     async def buildembed_setfield(self, ctx, index: int, name, value):
         if not await self.check_embed(ctx):
             return
-        await self.check_field(ctx)
+        await self.check_fields(ctx)
         embed = self.user_embeds[ctx.message.author.id]
         try:
             field = embed['fields']['index']
@@ -253,7 +253,7 @@ class Embed(DataCog):
     async def buildembed_setfieldnotinline(self, ctx, index: int, name, value):
         if not await self.check_embed(ctx):
             return
-        await self.check_field(ctx)
+        await self.check_fields(ctx)
         embed = self.user_embeds[ctx.message.author.id]
         try:
             field = embed['fields']['index']
