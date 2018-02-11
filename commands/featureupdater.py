@@ -68,7 +68,7 @@ class FeatureUpdater(DataCog):
         await self.bot.say('```json\n{}```'.format(urllib.parse.unquote(json.dumps(self.settings['features'], separators=(', ', ': '), indent=2))))
 
     '''
-    I *could* remove the repetition for these three commands (i.e. compact it into one command that takes the property,)
+    I *could* remove the repetition for the below commands (i.e. compact it into one command that takes the property,)
     but I think I'll keep it this way just to make it easier to use.
     '''
 
